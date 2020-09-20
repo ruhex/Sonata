@@ -27,11 +27,13 @@ func main() {
 	//fmt.Printf("%x", sum)
 	//fmt.Print(fmt.Sprintf("%x", sha256.Sum256(readBuf)))
 
-	conn, _ := net.Dial("tcp", "127.0.0.1:9002")
+	conn, _ := net.Dial("tcp", "127.0.0.1:9005")
 
 	conn.Write([]byte("file_send\n"))
 	io.Copy(conn, file)
-
-	conn.Close()
+	file.Close()
+	//res, _ := bufio.NewReader(conn).ReadString('\n')
+	//fmt.Printf("SHA-256: %x\n", string(res))
+	defer conn.Close()
 
 }
