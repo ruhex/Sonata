@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"net"
+	"os"
 )
 
 func main() {
@@ -29,7 +31,17 @@ func main() {
 			log.Printf("Reader stream error: %s", err)
 		}
 		fmt.Printf("CMD: %s\n", string(cmd))
-		conn.Close()
+
+		if string(cmd) == "file_send\n" {
+			file, err := os.Create("test.jpg")
+			if err != nil {
+				log.Printf("Connect error: %s", err)
+			}
+			io.Copy(file, conn)
+			file.Close()
+			fmt.Printf("File created")
+		}
+		defer conn.Close()
 
 	}
 
