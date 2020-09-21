@@ -45,7 +45,7 @@ func main() {
 			sum := sha256.Sum256(bufFile)
 			fmt.Printf("SHA-256: %x\n", sum)
 
-			file, err := os.Create(fmt.Sprintf("%x.jpg", sum))
+			file, err := os.Create(fmt.Sprintf("./files/%x.jpg", sum))
 			if err != nil {
 				log.Printf("Connect error: %s", err)
 			}
