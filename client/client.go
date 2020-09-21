@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// ----------------------------- AES CFB Decrypt ----------------------------- //
 func decrypt(key, data []byte) []byte {
 
 	block, err := aes.NewCipher(key)
@@ -26,21 +27,16 @@ func decrypt(key, data []byte) []byte {
 	iv := data[:aes.BlockSize]
 	data = data[aes.BlockSize:]
 
-	if len(data)%aes.BlockSize != 0 {
-		panic("ciphertext is not a multiple of the block size")
-	}
+	stream := cipher.NewCFBDecrypter(block, iv)
 
-	mode := cipher.NewCBCDecrypter(block, iv)
-	mode.CryptBlocks(data, data)
-
-	//fmt.Printf("%s\n", ciphertext)
+	stream.XORKeyStream(data, data)
+	//fmt.Printf("%s", data)
 	return data
 }
 
+// ----------------------------- AES CFB Encrypt ----------------------------- //
 func encrypt(key, data []byte) []byte {
-	if len(data)%aes.BlockSize != 0 {
-		panic("plaintext is not a multiple of the block size")
-	}
+
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
@@ -52,8 +48,8 @@ func encrypt(key, data []byte) []byte {
 		panic(err)
 	}
 
-	mode := cipher.NewCBCEncrypter(block, iv)
-	mode.CryptBlocks(ciphertext[aes.BlockSize:], data)
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(ciphertext[aes.BlockSize:], data)
 
 	//fmt.Printf("%x\n", ciphertext)
 	return ciphertext
