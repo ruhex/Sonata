@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
-	"os"
 	"strconv"
 	"time"
 )
@@ -62,21 +61,13 @@ func encrypt(key, data []byte) []byte {
 
 func main() {
 
-	data, err := ioutil.ReadFile("1.jpg")
+	data, err := ioutil.ReadFile("404.jpg")
 	if err != nil {
 		fmt.Println("File reading error", err)
 		return
 	}
 
-	file, err := os.Open("1.jpg")
-	if err != nil {
-		log.Printf("File open error: %s", err)
-	}
-
 	fmt.Printf("File size: %v\n", len(data))
-	//sum := sha256.Sum256(data)
-	//fmt.Printf("%x", sum)
-	//fmt.Print(fmt.Sprintf("%x", sha256.Sum256(readBuf)))
 
 	conn, err := net.DialTimeout("tcp", "127.0.0.1:9005", 2*time.Second)
 	if err != nil {
@@ -95,6 +86,5 @@ func main() {
 	bufSha256 := make([]byte, 64)
 	conn.Read(bufSha256)
 	fmt.Printf("SHA-256: %s\n", string(bufSha256))
-	file.Close()
 
 }
