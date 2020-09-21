@@ -1,14 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"crypto/sha256"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -21,25 +20,41 @@ func main() {
 	if err != nil {
 		log.Printf("%s", err)
 	}
-
+	bufCmd := make([]byte, 1)
+	bufFileSize := make([]byte, 16)
+	//bufSha256 := make([]byte, 32)
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
 			fmt.Printf("Connect error: %s", err)
 		}
+		conn.Read(bufCmd)
 
-		cmd, _ := bufio.NewReader(conn).ReadString('\n')
+		//cmd, _ := bufio.NewReader(conn).ReadString('\n')
 		if err != nil {
 			fmt.Printf("Reader stream error: %s", err)
 		}
-		fmt.Printf("CMD: %s\n", string(cmd))
+		fmt.Printf("CMD: %x\n", string(bufCmd))
 
-		if string(cmd) == "file_send\n" {
+		if string(bufCmd) == "a" {
+
+			n, _ := conn.Read(bufFileSize)
+			fmt.Printf("len %v --> file size: %s\n", n, bufFileSize)
+
+			size, err := strconv.Atoi(fmt.Sprintf("%s", bufFileSize[0:n]))
+			if err != nil {
+				fmt.Printf("Get buf size error: %s", err)
+			}
+			bufFile := make([]byte, size)
+			conn.Read(bufFile)
+
 			file, err := os.Create("test.jpg")
 			if err != nil {
 				log.Printf("Connect error: %s", err)
 			}
-			io.Copy(file, conn)
+			//io.Copy(file, conn)
+			file.Write(bufFile)
+
 			file.Close()
 			fmt.Printf("File created\n")
 			data, err := ioutil.ReadFile("test.jpg")
@@ -49,7 +64,8 @@ func main() {
 			}
 			sum := sha256.Sum256(data)
 			fmt.Printf("SHA-256: %x\n", sum)
-			//conn.Write([]byte(fmt.Sprintf("%x\n", sum)))
+			conn.Write([]byte(fmt.Sprintf("%x", sum)))
+			//fmt.Fprintf(conn, "1\n")
 		}
 		defer conn.Close()
 
