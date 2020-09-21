@@ -14,7 +14,7 @@ func main() {
 	fmt.Printf("Sonata server start...\n")
 	fs := http.FileServer(http.Dir("./files"))
 	go http.ListenAndServe(":9000", fs)
-	go http.ListenAndServeTLS(":9001", "server.rsa.crt", "server.rsa.key", fs)
+	go http.ListenAndServeTLS(":9001", "./tls/server.rsa.crt", "./tls/server.rsa.key", fs)
 
 	ln, err := net.Listen("tcp", ":9005")
 	if err != nil {

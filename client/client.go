@@ -1,7 +1,11 @@
 package main
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net"
@@ -9,6 +13,32 @@ import (
 	"strconv"
 	"time"
 )
+
+func encrypt(key, data []byte) []byte {
+	if len(data)%aes.BlockSize != 0 {
+		panic("plaintext is not a multiple of the block size")
+	}
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err)
+	}
+
+	ciphertext := make([]byte, aes.BlockSize+len(data))
+	iv := ciphertext[:aes.BlockSize]
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		panic(err)
+	}
+
+	mode := cipher.NewCBCEncrypter(block, iv)
+	mode.CryptBlocks(ciphertext[aes.BlockSize:], data)
+
+	// It's important to remember that ciphertexts must be authenticated
+	// (i.e. by using crypto/hmac) as well as being encrypted in order to
+	// be secure.
+
+	//fmt.Printf("%x\n", ciphertext)
+	return ciphertext
+}
 
 func main() {
 
