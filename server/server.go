@@ -22,7 +22,6 @@ func main() {
 	}
 	bufCmd := make([]byte, 1)
 	bufFileSize := make([]byte, 16)
-	//bufSha256 := make([]byte, 32)
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
@@ -30,10 +29,6 @@ func main() {
 		}
 		conn.Read(bufCmd)
 
-		//cmd, _ := bufio.NewReader(conn).ReadString('\n')
-		if err != nil {
-			fmt.Printf("Reader stream error: %s", err)
-		}
 		fmt.Printf("CMD: %x\n", string(bufCmd))
 
 		if string(bufCmd) == "a" {
@@ -52,7 +47,6 @@ func main() {
 			if err != nil {
 				log.Printf("Connect error: %s", err)
 			}
-			//io.Copy(file, conn)
 			file.Write(bufFile)
 
 			file.Close()

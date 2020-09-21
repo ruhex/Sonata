@@ -39,16 +39,12 @@ func main() {
 	conn.Write([]byte(strconv.Itoa(len(data))))
 	conn.Write(data)
 
-	//conn.SetReadDeadline(time.Now().Add(time.Second))
-	//count, err := io.Copy(conn, file)
 	if err != nil {
 		log.Printf("Stream copy error: %s", err)
 	}
-
-	//fmt.Printf("count write to stream: %v\n", count)
 	bufSha256 := make([]byte, 64)
 	conn.Read(bufSha256)
-	fmt.Printf("CMD: %s\n", string(bufSha256))
+	fmt.Printf("SHA-256: %s\n", string(bufSha256))
 	file.Close()
 
 }
