@@ -14,6 +14,30 @@ import (
 	"time"
 )
 
+func decrypt(key, data []byte) []byte {
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(data) < aes.BlockSize {
+		panic("ciphertext too short")
+	}
+	iv := data[:aes.BlockSize]
+	data = data[aes.BlockSize:]
+
+	if len(data)%aes.BlockSize != 0 {
+		panic("ciphertext is not a multiple of the block size")
+	}
+
+	mode := cipher.NewCBCDecrypter(block, iv)
+	mode.CryptBlocks(data, data)
+
+	//fmt.Printf("%s\n", ciphertext)
+	return data
+}
+
 func encrypt(key, data []byte) []byte {
 	if len(data)%aes.BlockSize != 0 {
 		panic("plaintext is not a multiple of the block size")
@@ -31,10 +55,6 @@ func encrypt(key, data []byte) []byte {
 
 	mode := cipher.NewCBCEncrypter(block, iv)
 	mode.CryptBlocks(ciphertext[aes.BlockSize:], data)
-
-	// It's important to remember that ciphertexts must be authenticated
-	// (i.e. by using crypto/hmac) as well as being encrypted in order to
-	// be secure.
 
 	//fmt.Printf("%x\n", ciphertext)
 	return ciphertext
