@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -43,7 +42,10 @@ func main() {
 			bufFile := make([]byte, size)
 			conn.Read(bufFile)
 
-			file, err := os.Create("test.jpg")
+			sum := sha256.Sum256(bufFile)
+			fmt.Printf("SHA-256: %x\n", sum)
+
+			file, err := os.Create(fmt.Sprintf("%x.jpg", sum))
 			if err != nil {
 				log.Printf("Connect error: %s", err)
 			}
@@ -51,13 +53,12 @@ func main() {
 
 			file.Close()
 			fmt.Printf("File created\n")
-			data, err := ioutil.ReadFile("test.jpg")
+
+			/* data, err := ioutil.ReadFile("test.jpg")
 			if err != nil {
 				fmt.Printf("File reading error: %s", err)
 				return
-			}
-			sum := sha256.Sum256(data)
-			fmt.Printf("SHA-256: %x\n", sum)
+			} */
 			conn.Write([]byte(fmt.Sprintf("%x", sum)))
 			//fmt.Fprintf(conn, "1\n")
 		}
