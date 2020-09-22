@@ -13,6 +13,14 @@ import (
 	"time"
 )
 
+// TCPCommand ...
+type TCPCommand struct {
+	SendFile, GetFile []byte
+}
+
+// Cmd start init byte for send to tcp stream command to server or client
+var Cmd = TCPCommand{[]byte("a"), []byte("b")}
+
 // ----------------------------- AES CFB Decrypt ----------------------------- //
 func decrypt(key, data []byte) []byte {
 
@@ -72,7 +80,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	conn.Write([]byte("a"))
+	conn.Write(Cmd.SendFile)
 	conn.Write([]byte(strconv.Itoa(len(data))))
 	conn.Write(data)
 

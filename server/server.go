@@ -10,6 +10,14 @@ import (
 	"strconv"
 )
 
+// TCPCommand ...
+type TCPCommand struct {
+	SendFile, GetFile []byte
+}
+
+// Cmd start init byte for send to tcp stream command to server or client
+var Cmd = TCPCommand{[]byte("a"), []byte("b")}
+
 func main() {
 	fmt.Printf("Sonata server start...\n")
 	fs := http.FileServer(http.Dir("./files"))
