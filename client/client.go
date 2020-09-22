@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -65,15 +66,23 @@ func encrypt(key, data []byte) []byte {
 
 func main() {
 
-	data, err := ioutil.ReadFile("404.jpg")
+	fileName := flag.String("f", "", "file name")
+	password := flag.String("p", "", "password")
+	server := flag.String("s", "127.0.0.1:9005", "server ip")
+
+	flag.Parse()
+
+	data, err := ioutil.ReadFile(*fileName)
 	if err != nil {
 		fmt.Println("File reading error", err)
 		return
 	}
 
+	data = encrypt([]byte(*password), data)
+
 	fmt.Printf("File size: %v\n", len(data))
 
-	conn, err := net.DialTimeout("tcp", "127.0.0.1:9005", 2*time.Second)
+	conn, err := net.DialTimeout("tcp", *server, 2*time.Second)
 	if err != nil {
 		fmt.Println(err)
 		return
