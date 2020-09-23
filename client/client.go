@@ -38,9 +38,7 @@ func decrypt(key, data []byte) []byte {
 	data = data[aes.BlockSize:]
 
 	stream := cipher.NewCFBDecrypter(block, iv)
-
 	stream.XORKeyStream(data, data)
-	//fmt.Printf("%s", data)
 	return data
 }
 
@@ -60,8 +58,6 @@ func encrypt(key, data []byte) []byte {
 
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], data)
-
-	//fmt.Printf("%x\n", ciphertext)
 	return ciphertext
 }
 
