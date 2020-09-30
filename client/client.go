@@ -87,10 +87,9 @@ func main() {
 		return
 	}
 	fmt.Println("File readed")
-	//fmt.Printf("File size: %v\n", len(data))
 
 	if *server != "" {
-		conn, err := net.DialTimeout("tcp", *server, 2*time.Second)
+		conn, err := net.DialTimeout("tcp", *server, 5*time.Second)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -120,5 +119,4 @@ func main() {
 			ioutil.WriteFile(*outFileName, data, 0644)
 		}
 	}
-
 }

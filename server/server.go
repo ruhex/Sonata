@@ -63,13 +63,7 @@ func main() {
 			file.Close()
 			fmt.Printf("File created\n")
 
-			/* data, err := ioutil.ReadFile("test.jpg")
-			if err != nil {
-				fmt.Printf("File reading error: %s", err)
-				return
-			} */
 			conn.Write([]byte(fmt.Sprintf("%x", sum)))
-			//fmt.Fprintf(conn, "1\n")
 		}
 		defer conn.Close()
 
