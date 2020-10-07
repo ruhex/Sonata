@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"net"
+	"strconv"
 	"time"
 
 	"../pkg/crypt"
@@ -62,6 +64,12 @@ func main() {
 		println(err)
 	}
 
+	echo, err := sendFile([]byte("a"), file, len(file))
+	if err != nil {
+		fmt.Printf("%s", err)
+	}
+	fmt.Printf("test: %s", echo)
+
 }
 
 func fileRead(fileName string) ([]byte, error) {
@@ -70,6 +78,26 @@ func fileRead(fileName string) ([]byte, error) {
 
 func savefile(fileName string, data []byte) error {
 	return ioutil.WriteFile(fileName, data, 0644)
+}
+
+func sendFile(cmd, data []byte, buffLen int) ([]byte, error) {
+	buff := make([]byte, 16)
+	conn, err := net.DialTimeout("tcp", "127.0.0.1:9005", 2*time.Second)
+	defer conn.Close()
+
+	if err != nil {
+		return nil, err
+
+	}
+	buff = []byte(strconv.Itoa(buffLen) + "\x00")
+	fmt.Printf("size: %s\n", buff)
+	conn.Write(cmd)
+	conn.Write(buff)
+	fmt.Printf("data size: %v", len(data))
+	conn.Write(data)
+	conn.Read(buff)
+	return buff, nil
+
 }
 
 func sendData(cmd []byte, buffLen int64) ([]byte, error) {

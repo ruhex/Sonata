@@ -2,10 +2,21 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
+	"strconv"
 )
+
+func getSize(data []byte) int {
+	for index := range data {
+		if data[index] == '\x00' {
+			return index
+		}
+	}
+	return 0
+}
 
 func main() {
 	fmt.Printf("Sonata server start...\n")
@@ -19,13 +30,33 @@ func main() {
 
 	for {
 		conn, err := ln.Accept()
+		defer conn.Close()
 		if err != nil {
 			fmt.Printf("Connect error: %s", err)
 		}
 		bufCmd := make([]byte, 1)
+		buffSize := make([]byte, 16)
 		conn.Read(bufCmd)
-		fmt.Printf("%s", bufCmd)
+		if string(bufCmd) == "a" {
+			println("command: a")
+			conn.Read(buffSize)
+			size, err := strconv.Atoi(fmt.Sprintf("%s", buffSize[0:getSize(buffSize)]))
+			if err != nil {
+				fmt.Printf("error: %v", err)
+			}
+			fmt.Printf("size: %v\n", size)
+			buffFile := make([]byte, size)
+
+			n, err := conn.Read(buffFile)
+			if err != nil {
+				fmt.Printf("error: %v\n", err)
+			}
+			fmt.Printf("len1: %v", n)
+
+			fmt.Printf("buffer: %v\n", len(buffFile))
+			ioutil.WriteFile("test", buffFile, 0644)
+		}
 		conn.Write([]byte("ok"))
-		conn.Close()
+
 	}
 }
