@@ -2,6 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"net"
+	"time"
 )
 
 var (
@@ -24,8 +27,8 @@ func init() {
 	flag.StringVar(&argv.server, `s`, `localhost:9005`, `remote conf server`)
 	flag.BoolVar(&argv.help, `h`, false, `show this help`)
 	flag.BoolVar(&argv.local, `l`, false, `enable local save file`)
-	flag.BoolVar(&argv.decrypt, `d`, false, `encrypt file`)
-	flag.BoolVar(&argv.encrypt, `e`, false, `decrypt file`)
+	flag.BoolVar(&argv.decrypt, `d`, false, `decrypt file`)
+	flag.BoolVar(&argv.encrypt, `e`, false, `necrypt file`)
 	flag.StringVar(&argv.file, `f`, ``, `open file name`)
 	flag.StringVar(&argv.outname, `o`, `config.conf`, `out file name`)
 	flag.StringVar(&argv.passwd, `p`, ``, `password for crypt`)
@@ -37,4 +40,20 @@ func main() {
 		flag.Usage()
 		return
 	}
+
+	sendCmd([]byte("a"))
+
+}
+
+func sendCmd(cmd []byte) {
+	buff := make([]byte, 10)
+	conn, err := net.DialTimeout("tcp", "127.0.0.1:9005", 2*time.Second)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	conn.Write(cmd)
+	conn.Read(buff)
+	fmt.Printf("%s", buff)
+	conn.Close()
 }

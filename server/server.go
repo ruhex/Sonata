@@ -68,7 +68,7 @@ func sendFile(conn net.Conn) {
 
 }
 
-func main() {
+func test() {
 	fmt.Printf("Sonata server start...\n")
 	fs := http.FileServer(http.Dir("./files"))
 	go http.ListenAndServe(":9000", fs)

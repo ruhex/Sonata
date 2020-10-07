@@ -4,12 +4,18 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"crypto/sha256"
 	"io"
 )
 
-// Decrypt AES CFB ----------------------------------------------------------//
-func Decrypt(key, data []byte) []byte {
+func getKey(passwd string) []byte {
+	tmp := sha256.Sum256([]byte(passwd))
+	return tmp[:]
+}
 
+// Decrypt AES CFB ----------------------------------------------------------//
+func Decrypt(passwd string, data []byte) []byte {
+	key := getKey(passwd)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
@@ -27,8 +33,8 @@ func Decrypt(key, data []byte) []byte {
 }
 
 // Encrypt AES CFB ----------------------------------------------------------//
-func Encrypt(key, data []byte) []byte {
-
+func Encrypt(passwd string, data []byte) []byte {
+	key := getKey(passwd)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
