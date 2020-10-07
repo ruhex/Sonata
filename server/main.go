@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -54,7 +55,7 @@ func main() {
 			fmt.Printf("len1: %v", n)
 
 			fmt.Printf("buffer: %v\n", len(buffFile))
-			ioutil.WriteFile("test", buffFile, 0644)
+			ioutil.WriteFile(fmt.Sprintf("./files/%x", sha256.Sum256(buffFile)), buffFile, 0644)
 		}
 		conn.Write([]byte("ok"))
 
