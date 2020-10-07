@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"io/ioutil"
 	"net"
 	"time"
+
+	"../pkg/crypt"
 )
 
 var (
@@ -41,19 +43,47 @@ func main() {
 		return
 	}
 
-	sendCmd([]byte("a"))
+	//sendData([]byte("a"), 10)
+
+	file, err := fileRead(argv.file)
+	if err != nil {
+		println(err)
+	}
+
+	if argv.encrypt {
+		file = crypt.Encrypt(argv.passwd, file)
+	}
+
+	if argv.decrypt {
+		file = crypt.Decrypt(argv.passwd, file)
+	}
+
+	if savefile(argv.outname, file) != nil {
+		println(err)
+	}
 
 }
 
-func sendCmd(cmd []byte) {
-	buff := make([]byte, 10)
+func fileRead(fileName string) ([]byte, error) {
+	return ioutil.ReadFile(fileName)
+}
+
+func savefile(fileName string, data []byte) error {
+	return ioutil.WriteFile(fileName, data, 0644)
+}
+
+func sendData(cmd []byte, buffLen int64) ([]byte, error) {
+	buff := make([]byte, buffLen)
 	conn, err := net.DialTimeout("tcp", "127.0.0.1:9005", 2*time.Second)
+	defer conn.Close()
+
 	if err != nil {
-		fmt.Println(err)
-		return
+		return nil, err
+
 	}
+
 	conn.Write(cmd)
 	conn.Read(buff)
-	fmt.Printf("%s", buff)
-	conn.Close()
+	return buff, nil
+
 }
